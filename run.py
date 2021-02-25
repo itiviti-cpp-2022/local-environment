@@ -15,8 +15,8 @@ def init_argparser():
   )
   parser.add_argument("repo", help="Path to repository containing the project")
   parser.add_argument("-b", "--build", help="Run only build, without actually"
-                                              " testing the project",
-                      dest="only_build")
+                                            " testing the project",
+                      dest="only_build", action="store_true")
   return parser
 
 
