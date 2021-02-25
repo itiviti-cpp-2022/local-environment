@@ -74,12 +74,6 @@ tests () {
   echo "[+] ASAN test success"
   (( cnt++ ))
 
-  echo "[$cnt] Running tests with MSAN (Memory Sanitizer)"
-  build /build_msan -DCMAKE_BUILD_TYPE=MSAN
-  run_test /build_msan
-  echo "[+] MSAN test success"
-  (( cnt++ ))
-
   echo "[$cnt] Running tests with USAN (Undefined Behaviour Sanitizer)"
   build /build_usan -DCMAKE_BUILD_TYPE=USAN
   run_test /build_usan
