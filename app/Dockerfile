@@ -11,6 +11,10 @@ RUN sudo apt-get install -y \
 # Install clang, cmake for compiling and using ICA
 RUN apt install clang cmake -y
 
+# Make clang the default compiler
+RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-10 60
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang-10 60
+
 RUN mkdir /env
 WORKDIR /env
 
