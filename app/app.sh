@@ -50,7 +50,7 @@ build () {
   fi
 
   echo "[$cnt] Generating build files with cmake"
-  run_cmake "$1" "$2"
+  run_cmake "$1" "${@:2}"
   echo "[+] Cmake success"
   (( cnt++ ))
 
@@ -98,11 +98,11 @@ fi
 
 case $1 in
   build)
-    build /build -DUSE_CLANG_TIDY=TRUE
+    build /build -DUSE_CLANG_TIDY=TRUE -DPATH_TO_ICA=/env/libica-plugin.so
     ;;
 
   test)
-    build /build -DUSE_CLANG_TIDY=TRUE
+    build /build -DUSE_CLANG_TIDY=TRUE -DPATH_TO_ICA=/env/libica-plugin.so
     tests
     ;;
 
