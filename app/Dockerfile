@@ -3,7 +3,8 @@ FROM dokken/ubuntu-20.04:latest
 LABEL maintainer="renbou"
 
 # Like in workflow
-RUN sudo apt-get install -y \
+RUN apt update
+RUN a./runpt install -y \
       clang-tidy-10; \
     sudo update-alternatives --install \
       /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-10 100;
