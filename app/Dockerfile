@@ -4,7 +4,7 @@ LABEL maintainer="renbou"
 
 # Like in workflow
 RUN apt update
-RUN a./runpt install -y \
+RUN apt install -y \
       clang-tidy-10; \
     sudo update-alternatives --install \
       /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-10 100;
