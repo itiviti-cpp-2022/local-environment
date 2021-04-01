@@ -2,7 +2,7 @@
 import argparse
 import os
 import sys
-from util import variables, run_with_stdout, format_template
+from util import env, run_with_stdout, format_template, assert_requirements
 
 
 def init_argparser():
@@ -33,10 +33,11 @@ def run_image(args):
 
   if run_with_stdout(format_template(
     "docker run --volume={{path}}:{{container_repo_path}} cpp-env:1.0 {{act}}",
-      {**variables, "path": path, "act": action})) != 0:
+      {**env.variables, "path": path, "act": action})) != 0:
     print("Running failed :(")
 
 
 if __name__ == '__main__':
+  assert_requirements(env.requirements)
   parser = init_argparser()
   run_image(parser.parse_args())
