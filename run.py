@@ -2,7 +2,7 @@
 import argparse
 import os
 import sys
-from util import variables, run_with_stdout, format_template
+from util import env, run_with_stdout, format_template, check_file_update
 
 
 def init_argparser():
@@ -33,10 +33,16 @@ def run_image(args):
 
   if run_with_stdout(format_template(
     "docker run --volume={{path}}:{{container_repo_path}} cpp-env:1.0 {{act}}",
-      {**variables, "path": path, "act": action})) != 0:
+      {**env.variables, "path": path, "act": action})) != 0:
     print("Running failed :(")
 
 
 if __name__ == '__main__':
+  # Check if newer dependencies are available
+  for dep in env.dependencies:
+    if check_file_update(dep["repo"], dep["path"]):
+      print("Update available for dependency {}. Please run build.py."
+            .format(os.path.basename(dep["path"])))
+      sys.exit(0)
   parser = init_argparser()
   run_image(parser.parse_args())
