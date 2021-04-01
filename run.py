@@ -2,7 +2,7 @@
 import argparse
 import os
 import sys
-from util import env, run_with_stdout, format_template, assert_requirements
+from util import env, run_with_stdout, format_template, check_file_update
 
 
 def init_argparser():
@@ -38,6 +38,11 @@ def run_image(args):
 
 
 if __name__ == '__main__':
-  assert_requirements(env.requirements)
+  # Check if newer dependencies are available
+  for dep in env.dependencies:
+    if check_file_update(dep["repo"], dep["path"]):
+      print("Update available for dependency {}. Please run build.py."
+            .format(os.path.basename(dep["path"])))
+      sys.exit(0)
   parser = init_argparser()
   run_image(parser.parse_args())

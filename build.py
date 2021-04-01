@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
-from util import env, run_with_stdout, format_template_file, assert_requirements
+from util import env, run_with_stdout, format_template_file, assert_dependencies
 
 
 def preprocess():
@@ -24,7 +24,8 @@ def build_image():
 
 
 if __name__ == '__main__':
-  assert_requirements(env.requirements)
+  # Make sure that our dependencies are satisfied
+  assert_dependencies(env.dependencies)
   preprocess()
   build_image()
   postprocess()
