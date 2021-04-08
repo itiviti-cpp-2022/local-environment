@@ -21,10 +21,20 @@ def init_argparser():
                                            " format+push on success",
                       dest="send", action="store_true")
   parser.add_argument("-cf", "--clang-format", help="Path to your own"
-                      " clang-format file, which will be used to reformat"
-                      " the code back to your style after sending.",
+                                                    " clang-format file, which will be used to reformat"
+                                                    " the code back to your style after sending.",
                       dest="clang_format")
   return parser
+
+
+def exec_docker(args, volumes=[]):
+  if run_with_stdout(format_template(
+      "docker run --volume={{path}}:{{container_repo_path}} " +
+      "".join(["--volume=" + v + " " for v in volumes]) +
+      "cpp-env:1.0 {{act}}",
+      args)) != 0:
+    print("Running failed :(")
+    sys.exit(1)
 
 
 def run_image(args):
@@ -37,15 +47,31 @@ def run_image(args):
     sys.exit(1)
 
   action = "build" if args.only_build else "test"
-
-  if run_with_stdout(format_template(
-    "docker run --volume={{path}}:{{container_repo_path}} cpp-env:1.0 {{act}}",
-      {**env.variables, "path": path, "act": action})) != 0:
-    print("Running failed :(")
-    sys.exit(1)
+  #exec_docker({**env.variables, "path": path, "act": action})
 
   # after running the docker container check if we need to do anything else
+  if args.send:
+    print("Formatting to remote clang-format")
+    exec_docker({**env.variables, "path": path, "act": "format"})
 
+    # temporarily switch to repo
+    oldpwd = os.getcwd()
+    os.chdir(path)
+    print("Committing formatted changes to repo")
+    run_with_stdout("git add .")
+    run_with_stdout("git commit -m \"(local-env) test and format\"")
+    run_with_stdout("git push")
+    os.chdir(oldpwd)
+
+    if args.clang_format:
+      clang_format_path = os.path.realpath(args.clang_format)
+      if not os.path.exists(clang_format_path):
+        print("Specified personal clang-format file doesn't exist.")
+        sys.exit(1)
+      print("Formatting to local clang-format using " + clang_format_path)
+      exec_docker({**env.variables, "path": path,
+                   "act": "format /format"},
+                  [clang_format_path + ":/format/.clang-format"])
 
 
 if __name__ == '__main__':
