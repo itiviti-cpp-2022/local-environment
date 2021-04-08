@@ -92,7 +92,10 @@ format () {
   # find matching files for clang-format
   file_list="$(find "$REPO_PATH" -regextype posix-extended -regex '.*\.(cpp|h)' -not -regex '.*(test|debug).*')"
 
-  clang-format "$@" $file_list
+  # format using specified clang-format settings (directory with .clang-format)
+  cd "$1"
+  clang-format "${@:2}" $file_list
+  cd "$OLDPWD"
 }
 
 help () {
@@ -119,8 +122,7 @@ case $1 in
     ;;
 
   format)
-
-    format --verbose -i $2
+    format "${2:-$REPO_PATH}" --verbose -i -style=file
     ;;
   *)
     echo -ne "Invalid argument.\n\n"
