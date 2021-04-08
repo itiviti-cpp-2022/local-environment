@@ -2,6 +2,7 @@ import importlib.util
 import subprocess
 import sys
 
+
 def check(requirements):
   """Check that all the requirements are installed
   :param: requirements: list of required modules as strings
