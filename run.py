@@ -17,6 +17,13 @@ def init_argparser():
   parser.add_argument("-b", "--build", help="Run only build, without actually"
                                             " testing the project",
                       dest="only_build", action="store_true")
+  parser.add_argument("-s", "--send", help="Test the project and "
+                                           " format+push on success",
+                      dest="send", action="store_true")
+  parser.add_argument("-cf", "--clang-format", help="Path to your own"
+                      " clang-format file, which will be used to reformat"
+                      " the code back to your style after sending.",
+                      dest="clang_format")
   return parser
 
 
@@ -35,6 +42,10 @@ def run_image(args):
     "docker run --volume={{path}}:{{container_repo_path}} cpp-env:1.0 {{act}}",
       {**env.variables, "path": path, "act": action})) != 0:
     print("Running failed :(")
+    sys.exit(1)
+
+  # after running the docker container check if we need to do anything else
+  
 
 
 if __name__ == '__main__':

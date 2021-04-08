@@ -32,7 +32,7 @@ def build_image():
   if run_with_stdout("docker image build . "
                      "--file app/Dockerfile.build --tag cpp-env:1.0") != 0:
     print("Docker build failed.")
-    sys.exit(-1)
+    sys.exit(1)
   os.chdir(oldpwd)
 
 

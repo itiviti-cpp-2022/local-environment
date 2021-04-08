@@ -36,4 +36,4 @@ def assert_requirements(requirements):
   """
   if not check(requirements) and not install(requirements):
     print("Requirements aren't present and unable to install them. Quitting.")
-    sys.exit(-1)
+    sys.exit(1)
