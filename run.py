@@ -45,7 +45,7 @@ def run_image(args):
     sys.exit(1)
 
   # after running the docker container check if we need to do anything else
-  
+
 
 
 if __name__ == '__main__':

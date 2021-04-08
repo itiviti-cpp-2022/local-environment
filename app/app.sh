@@ -83,6 +83,18 @@ tests () {
   echo "[+] Test success! Woohoo! Go ahead and submit this badboi to github :)"
 }
 
+format () {
+  if [[ -z $REPO_PATH || ! -d $REPO_PATH ]]; then
+    echo "Can't find repository, quitting"
+    exit 1
+  fi
+
+  # find matching files for clang-format
+  file_list="$(find "$REPO_PATH" -regextype posix-extended -regex '.*\.(cpp|h)' -not -regex '.*(test|debug).*')"
+
+  clang-format "$@" $file_list
+}
+
 help () {
   cat << EOF
 usage: $0 [action]
@@ -106,6 +118,10 @@ case $1 in
     tests
     ;;
 
+  format)
+
+    format --verbose -i $2
+    ;;
   *)
     echo -ne "Invalid argument.\n\n"
     help
