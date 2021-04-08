@@ -47,7 +47,7 @@ def run_image(args):
     sys.exit(1)
 
   action = "build" if args.only_build else "test"
-  #exec_docker({**env.variables, "path": path, "act": action})
+  exec_docker({**env.variables, "path": path, "act": action})
 
   # after running the docker container check if we need to do anything else
   if args.send:
