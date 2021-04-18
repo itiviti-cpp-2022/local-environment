@@ -73,7 +73,7 @@ def run_image(args):
   exec_docker({**env.variables, "path": path, "act": action})
 
   # after running the docker container check if we need to do anything else
-  if args.send:
+  if args.action == "send":
     print("Formatting to remote clang-format")
     exec_docker({**env.variables, "path": path, "act": "format"})
 
