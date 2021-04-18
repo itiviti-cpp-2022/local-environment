@@ -5,6 +5,13 @@ import sys
 from util import env, run_with_stdout, format_template, check_file_update
 
 
+def action(act):
+  valid_actions = ["test", "build", "send", "checkfmt"]
+  if act not in valid_actions:
+    raise argparse.ArgumentTypeError("Unknown action: " + act)
+  return act
+
+
 def init_argparser():
   parser = argparse.ArgumentParser(
     description="Compile + test your project before submitting it to github.\n"
@@ -14,12 +21,23 @@ def init_argparser():
     formatter_class=argparse.RawTextHelpFormatter
   )
   parser.add_argument("repo", help="Path to repository containing the project")
-  parser.add_argument("-b", "--build", help="Run only build, without actually"
-                                            " testing the project",
-                      dest="only_build", action="store_true")
-  parser.add_argument("-s", "--send", help="Test the project and "
-                                           " format+push on success",
-                      dest="send", action="store_true")
+  parser.add_argument("action", nargs='?', help=
+                                     "Additional actions:\n"
+                                     "\ttest - Run build + test (default)\n"
+                                     "\tbuild - Run only build, without testing"
+                                     "\n\tsend - Test the project and "
+                                     " format+push on success."
+                                     "\n\t       You can use the -cf option"
+                                     " here to reformat back after sending.\n"
+                                     "\tcheckfmt - Check the formatting",
+                      type=action,
+                      default="test")
+  # parser.add_argument("-b", "--build", help="Run only build, without actually"
+  #                                           " testing the project",
+  #                     dest="only_build", action="store_true")
+  # parser.add_argument("-s", "--send", help="Test the project and "
+  #                                          " format+push on success",
+  #                     dest="send", action="store_true")
   parser.add_argument("-cf", "--clang-format", help="Path to your own"
                                                     " clang-format file, which will be used to reformat"
                                                     " the code back to your style after sending.",
@@ -46,6 +64,11 @@ def run_image(args):
     print("Specified repository path doesn't exist.")
     sys.exit(1)
 
+  if args.action == "checkfmt":
+    exec_docker({**env.variables, "path": path, "act": "check_format"})
+    return
+
+  # otherwise we need building/testing
   action = "build" if args.only_build else "test"
   exec_docker({**env.variables, "path": path, "act": action})
 

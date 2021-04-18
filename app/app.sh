@@ -90,7 +90,7 @@ format () {
   fi
 
   # find matching files for clang-format
-  file_list="$(find "$REPO_PATH" -regextype posix-extended -regex '.*\.(cpp|h)' -not -regex '.*(test|debug).*')"
+  file_list="$(find "$REPO_PATH" -regextype posix-extended -regex '.*\.(cpp|h)' -not -regex '.*(test|debug|cmake).*')"
 
   # format using specified clang-format settings (directory with .clang-format)
   cd "$1"
@@ -119,6 +119,10 @@ case $1 in
   test)
     build /build -DUSE_CLANG_TIDY=TRUE -DPATH_TO_ICA=/env/libica-plugin.so
     tests
+    ;;
+
+  check_format)
+    format "${2:-$REPO_PATH}" --dry-run --Werror --verbose -i -style=file
     ;;
 
   format)
