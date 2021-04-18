@@ -94,8 +94,16 @@ format () {
 
   # format using specified clang-format settings (directory with .clang-format)
   cd "$1"
-  clang-format "${@:2}" $file_list
+  if [[ "$2" == "grep" ]]; then
+    clang-format "${@:3}" $file_list 1>/tmp/clang-format 2>&1
+    status=$?
+    cat /tmp/clang-format | grep -v "Formatting"
+  else
+    clang-format "${@:3}" $file_list
+    status=$?
+  fi
   cd "$OLDPWD"
+  return $status
 }
 
 help () {
@@ -122,11 +130,17 @@ case $1 in
     ;;
 
   check_format)
-    format "${2:-$REPO_PATH}" --dry-run --Werror --verbose -i -style=file
+    format "${2:-$REPO_PATH}" grep --dry-run --Werror --verbose -i -style=file
+    status=$?
+    if [[ $status -eq 0 ]]; then
+      echo "[+] Formatting is correct for all files!"
+    else
+      echo "[^] Wrong formatting in some files..."
+    fi
     ;;
 
   format)
-    format "${2:-$REPO_PATH}" --verbose -i -style=file
+    format "${2:-$REPO_PATH}" nogrep --verbose -i -style=file
     ;;
   *)
     echo -ne "Invalid argument.\n\n"
