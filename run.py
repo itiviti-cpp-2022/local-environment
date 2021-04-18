@@ -69,7 +69,7 @@ def run_image(args):
     return
 
   # otherwise we need building/testing
-  action = "build" if args.only_build else "test"
+  action = "build" if args.action == "build" else "test"
   exec_docker({**env.variables, "path": path, "act": action})
 
   # after running the docker container check if we need to do anything else
