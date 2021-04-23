@@ -27,9 +27,16 @@ run_make () {
 
 # Run unit tests after building
 run_test () {
-  cd "$1"
-  if ! "$1/test/runUnitTests"; then
-    exit 1
+  if [[ -f "$1/test/runUnitTests" ]]; then
+    cd "$1"
+    if ! "$1/test/runUnitTests"; then
+      exit 1
+    fi
+  else
+    cd "$1/test"
+    if ! ctest -VV; then
+      exit 1
+    fi
   fi
   cd "$OLDPWD"
 }
