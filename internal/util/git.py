@@ -1,8 +1,9 @@
-from base64 import b64decode
 import datetime
 import requests
 import os
 import sys
+from base64 import b64decode
+from .log import error, info
 
 GITAPI = "https://api.github.com/"
 
@@ -21,7 +22,7 @@ def repo_latest_commit(repo):
     r = requests.get(repos_request(repo, "/commits/"+repo["branch"]))
     return r.json()
   except Exception as e:
-    print("Unable to get repository {} latest commit: {}".format(repo, e))
+    error("Unable to get repository {} latest commit: {}".format(repo, e))
   return None
 
 
@@ -33,7 +34,7 @@ def get_tree(url):
     r = requests.get(url)
     return r.json()
   except Exception as e:
-    print("Unable to get tree from url {}: {}".format(url, e))
+    error("Unable to get tree from url {}: {}".format(url, e))
   return None
 
 
@@ -46,7 +47,7 @@ def commit_tree(commit):
     tree = commit["commit"]["tree"]["url"]
     return get_tree(tree)
   except Exception as e:
-    print("Unable to get commit {} tree: {}".format(commit, e))
+    error("Unable to get commit {} tree: {}".format(commit, e))
   return None
 
 
@@ -60,7 +61,7 @@ def tree_path(tree, path):
     if len(path_object) != 0:
       return path_object[0]["url"]
   except Exception as e:
-    print("Unable to find required object {} in tree {}: {}"
+    error("Unable to find required object {} in tree {}: {}"
           .format(path, tree, e))
   return None
 
@@ -78,7 +79,7 @@ def download_blob(url):
     content = b64decode(contentb64)
     return content
   except Exception as e:
-    print("Unable to get content blob of {}: {}".format(url, e))
+    error("Unable to get content blob of {}: {}".format(url, e))
   return None
 
 
@@ -94,7 +95,7 @@ def repo_updated_at(repo):
                                             "%Y-%m-%dT%H:%M:%SZ")
     return updated_at
   except Exception as e:
-    print("Unable to get repository {} update time: {}".format(repo, e))
+    error("Unable to get repository {} update time: {}".format(repo, e))
   return None
 
 
@@ -120,7 +121,7 @@ def update_file(repo, remote_path, path):
   :param: path: local path to file which should be updated
   :return: True on successful update, False otherwise
   """
-  print("Updating remote dependency: {}".format(os.path.basename(path)))
+  info("Updating remote dependency: {}".format(os.path.basename(path)))
   # traverse commit tree to find the file
   latest_commit = repo_latest_commit(repo)
   if latest_commit is None:
@@ -157,5 +158,12 @@ def assert_dependencies(dependencies):
   for dep in dependencies:
     # try updating if needed and fail if we can't
     if check_file_update(dep["repo"], dep["path"]) and not update_file(**dep):
-      print("Unable to update dependency {}. Quitting.".format(dep))
+      error("Unable to update dependency {}. Quitting.".format(dep))
       sys.exit(1)
+
+
+def dependencies_need_updates(dependencies):
+  for dep in dependencies:
+    if check_file_update(dep["repo"], dep["path"]):
+      return True
+  return False

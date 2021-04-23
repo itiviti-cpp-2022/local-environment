@@ -13,20 +13,14 @@ check_file () {
 run_cmake () {
   check_file "$REPO_PATH/CMakeLists.txt"
   mkdir "$1"
-  cmake -S "$REPO_PATH" -B "$1" "${@:2}"
-  status=$?
-  if [[ ! $status -eq 0 ]]; then
-    echo "[^] Error running cmake"
+  if ! cmake -S "$REPO_PATH" -B "$1" "${@:2}"; then
     exit 1
   fi
 }
 
 # Build after running cmake
 run_make () {
-  make -C "$1"
-  status=$?
-  if [[ ! $status -eq 0 ]]; then
-    echo "[^] Error while building"
+  if ! make -C "$1"; then
     exit 1
   fi
 }
@@ -34,10 +28,7 @@ run_make () {
 # Run unit tests after building
 run_test () {
   cd "$1"
-  "$1/test/runUnitTests"
-  status=$?
-  if [[ ! $status -eq 0 ]]; then
-    echo "[^] Tests failed"
+  if ! "$1/test/runUnitTests"; then
     exit 1
   fi
   cd "$OLDPWD"
@@ -58,8 +49,6 @@ build () {
   run_make "$1"
   echo "[+] Make success"
   (( cnt++ ))
-
-  echo "[+] Successfully built the project!"
 }
 
 tests () {
@@ -79,11 +68,9 @@ tests () {
   run_test /build_usan
   echo "[+] USAN test success"
   (( cnt++ ))
-
-  echo "[+] Test success! Woohoo! Go ahead and submit this badboi to github :)"
 }
 
-format () {
+fmt () {
   if [[ -z $REPO_PATH || ! -d $REPO_PATH ]]; then
     echo "Can't find repository, quitting"
     exit 1
@@ -129,20 +116,16 @@ case $1 in
     tests
     ;;
 
-  check_format)
-    format "${2:-$REPO_PATH}" grep --dry-run --Werror --verbose -i -style=file
-    status=$?
-    if [[ $status -eq 0 ]]; then
-      echo "[+] Formatting is correct for all files!"
-    else
-      echo "[^] Wrong formatting in some files..."
-    fi
+  checkfmt)
+    fmt "${2:-$REPO_PATH}" grep --dry-run --Werror --verbose -i -style=file
+    exit $?
     ;;
 
-  format)
-    format "${2:-$REPO_PATH}" nogrep --verbose -i -style=file
+  fmt)
+    fmt "${2:-$REPO_PATH}" nogrep --verbose -i -style=file
     ;;
   *)
     echo -ne "Invalid argument.\n\n"
     help
+    exit 1
 esac

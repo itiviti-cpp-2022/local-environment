@@ -10,7 +10,7 @@ dependencies = [{"path": "app/libica-plugin.so",
 _project_path = path.realpath(
   path.join(
     path.dirname(path.realpath(__file__)),
-    pardir)
+    path.join(pardir, pardir))
 )
 for dep in dependencies:
   dep["path"] = path.join(_project_path, dep["path"])
