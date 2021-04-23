@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import os
 import sys
-from util import env, run_with_stdout, format_template_file, assert_dependencies
+from internal.util import env, run_with_stdout, format_template_file,\
+  assert_dependencies
 
 SCRIPT_FOLDER = os.path.dirname(os.path.realpath(__file__))
 APP_PATH = os.path.join(SCRIPT_FOLDER, 'app')

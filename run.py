@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import os
 import sys
-from util import env, dependencies_need_updates, warning, error
-from arguments import create_parser
+from internal.util import env, dependencies_need_updates, warning, error
+from internal.arguments import create_parser
 
 
 def run_image(args):

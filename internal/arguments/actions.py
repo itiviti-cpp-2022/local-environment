@@ -1,7 +1,6 @@
-import argparse
 import os
 import sys
-from ..util import info, error, warning, run_docker, run_with_stdout
+from internal.util import info, error, warning, run_docker, run_with_stdout
 
 
 def test(args):
@@ -57,7 +56,8 @@ def send(args):
 
 
 def add_actions(parser):
-  actions_parser = parser.add_subparsers(title="Actions", required=True)
+  actions_parser = parser.add_subparsers(title="Actions", required=True,
+                                         dest="action")
 
   test_parser = actions_parser.add_parser(
     "test", help="Run tests", description="Run build, then test without and"

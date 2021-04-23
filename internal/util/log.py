@@ -20,15 +20,15 @@ if not supports_color():
 
 
 def warning(message):
-  print(ansi["BOLD"] + ansi["WARNING"] + "[-]" + ansi["RESET"]
+  print(ansi["BOLD"] + ansi["WARNING"] + "[-] " + ansi["RESET"]
         + ansi["WARNING"] + message + ansi["RESET"])
 
 
 def error(message):
-  print(ansi["BOLD"] + ansi["ERROR"] + "[^]" + ansi["RESET"]
+  print(ansi["BOLD"] + ansi["ERROR"] + "[^] " + ansi["RESET"]
         + ansi["ERROR"] + message + ansi["RESET"])
 
 
 def info(message):
-  print(ansi["BOLD"] + ansi["INFO"] + "[+]" + ansi["RESET"]
+  print(ansi["BOLD"] + ansi["INFO"] + "[+] " + ansi["RESET"]
         + ansi["INFO"] + message + ansi["RESET"])
