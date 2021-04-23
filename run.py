@@ -1,60 +1,8 @@
 #!/usr/bin/env python3
-import argparse
 import os
 import sys
-from util import env, run_with_stdout, format_template, check_file_update
-
-
-def action(act):
-  valid_actions = ["test", "build", "send", "format", "checkfmt"]
-  if act not in valid_actions:
-    raise argparse.ArgumentTypeError("Unknown action: " + act)
-  return act
-
-
-def init_argparser():
-  parser = argparse.ArgumentParser(
-    description="Compile + test your project before submitting it to github.\n"
-                "Before running this, make sure you ran build.py in order to "
-                "create the required docker container.",
-    epilog="By @renbou with <3",
-    formatter_class=argparse.RawTextHelpFormatter
-  )
-  parser.add_argument("repo", help="Path to repository containing the project")
-  parser.add_argument("action", nargs='?', help=
-                                     "Additional actions:\n"
-                                     "\ttest - Run build + test (default)\n"
-                                     "\tbuild - Run only build, without testing"
-                                     "\n\tsend - Test the project and "
-                                     " format+push on success."
-                                     "\n\t       You can use the -cf option"
-                                     " here to reformat back after sending.\n"
-                                     "\tformat - Format without sending. You"
-                                     " can also use -cf here.\n"
-                                     "\tcheckfmt - Check the formatting",
-                      type=action,
-                      default="test")
-  parser.add_argument("-cf", "--clang-format",
-                      help="Path to your own"
-                           " clang-format file, which will be used to reformat"
-                           " the code back to your style after formatting.",
-                      dest="clang_format")
-  return parser
-
-
-def exec_docker(args, volumes=[]):
-  if run_with_stdout(format_template(
-      "docker run --volume={{path}}:{{container_repo_path}} " +
-      "".join(["--volume=" + v + " " for v in volumes]) +
-      "cpp-env:1.0 {{act}}",
-      args)) != 0:
-    print("Running failed :(")
-    sys.exit(1)
-
-
-def format(path):
-  print("Formatting to remote clang-format")
-  exec_docker({**env.variables, "path": path, "act": "format"})
+from util import env, dependencies_need_updates, warning, error
+from arguments import create_parser
 
 
 def run_image(args):
@@ -63,50 +11,16 @@ def run_image(args):
   """
   path = os.path.realpath(args.repo)
   if not os.path.exists(path):
-    print("Specified repository path doesn't exist.")
+    error("Specified repository path doesn't exist.")
     sys.exit(1)
-
-  if args.action == "checkfmt":
-    exec_docker({**env.variables, "path": path, "act": "check_format"})
-    return
-
-  if args.action == "format":
-    format(path)
-    return
-
-  # otherwise we need building/testing
-  action = "build" if args.action == "build" else "test"
-  exec_docker({**env.variables, "path": path, "act": action})
-
-  # after running the docker container check if we need to do anything else
-  if args.action == "send":
-    format(path)
-    # temporarily switch to repo
-    oldpwd = os.getcwd()
-    os.chdir(path)
-    print("Committing formatted changes to repo")
-    run_with_stdout("git add .")
-    run_with_stdout("git commit -m \"(local-env) test and format\"")
-    run_with_stdout("git push")
-    os.chdir(oldpwd)
-
-    if args.clang_format:
-      clang_format_path = os.path.realpath(args.clang_format)
-      if not os.path.exists(clang_format_path):
-        print("Specified personal clang-format file doesn't exist.")
-        sys.exit(1)
-      print("Formatting to local clang-format using " + clang_format_path)
-      exec_docker({**env.variables, "path": path,
-                   "act": "format /format"},
-                  [clang_format_path + ":/format/.clang-format"])
+  args.path = path
+  args.func(args)
 
 
 if __name__ == '__main__':
   # Check if newer dependencies are available
-  for dep in env.dependencies:
-    if check_file_update(dep["repo"], dep["path"]):
-      print("Update available for dependency {}. Please run build.py."
-            .format(os.path.basename(dep["path"])))
-      sys.exit(0)
-  parser = init_argparser()
+  if dependencies_need_updates(env.dependencies):
+    warning("Updates available for dependencies. Please run build.py.")
+    sys.exit(0)
+  parser = create_parser()
   run_image(parser.parse_args())
