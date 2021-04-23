@@ -24,17 +24,21 @@ def fmt(args):
     clang_format_path = os.path.realpath(args.clang_format)
     info("Formatting using custom clang-format file ({})"
          .format(clang_format_path))
-    if not os.path.exists(clang_format_path):
-      error("Specified clang-format file doesn't exist")
-      sys.exit(1)
-    run_docker(path=args.path, act="fmt /format"
-                [args.clang_format_path + ":/format/.clang-format"])
   else:
+    clang_format_path = os.path.join(args.path, ".clang_format")
     info("Formatting to remote clang-format")
-    run_docker(path=args.path, act="fmt")
+  if not os.path.exists(clang_format_path):
+    error(".clang-format file doesn't exist")
+    sys.exit(1)
+  run_docker(path=args.path, act="fmt /format"
+              [clang_format_path + ":/format/.clang-format"])
 
 
 def checkfmt(args):
+  clang_format_path = os.path.join(args.path, ".clang_format")
+  if not os.path.exists(clang_format_path):
+    error(".clang-format file doesn't exist")
+    sys.exit(1)
   if run_docker(path=args.path, act="checkfmt"):
     info("Formatting is correct for all files!")
   else:
