@@ -1,6 +1,7 @@
 import importlib.util
 import subprocess
 import sys
+from .log import info, error
 
 
 def check(requirements):
@@ -22,10 +23,10 @@ def install(requirements):
   """
   for r in requirements:
     try:
-      print("Installing requirement: {}".format(r))
+      info("Installing requirement: {}".format(r))
       subprocess.check_call([sys.executable, "-m", "pip", "install", r])
     except subprocess.CalledProcessError as e:
-      print("Error installing requirement {}: {}".format(r, e))
+      error("Error installing requirement {}: {}".format(r, e))
       return False
   return True
 
@@ -35,5 +36,5 @@ def assert_requirements(requirements):
   :param: requirements: list of required libraries as strings
   """
   if not check(requirements) and not install(requirements):
-    print("Requirements aren't present and unable to install them. Quitting.")
+    error("Requirements aren't present and unable to install them. Quitting.")
     sys.exit(1)
