@@ -27,11 +27,11 @@ def fmt(args):
     if not os.path.exists(clang_format_path):
       error("Specified clang-format file doesn't exist")
       sys.exit(1)
-    run_docker(path=args.path, act="format /format"
+    run_docker(path=args.path, act="fmt /format"
                 [args.clang_format_path + ":/format/.clang-format"])
   else:
     info("Formatting to remote clang-format")
-    run_docker(path=args.path, act="format")
+    run_docker(path=args.path, act="fmt")
 
 
 def checkfmt(args):
