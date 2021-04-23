@@ -16,6 +16,9 @@ RUN apt install clang cmake -y
 RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-10 60
 RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang-10 60
 
+# Install clang-format if we need formatting
+RUN apt install clang-format -y
+
 RUN mkdir /env
 WORKDIR /env
 

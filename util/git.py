@@ -158,4 +158,4 @@ def assert_dependencies(dependencies):
     # try updating if needed and fail if we can't
     if check_file_update(dep["repo"], dep["path"]) and not update_file(**dep):
       print("Unable to update dependency {}. Quitting.".format(dep))
-      sys.exit(-1)
+      sys.exit(1)

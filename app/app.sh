@@ -83,6 +83,29 @@ tests () {
   echo "[+] Test success! Woohoo! Go ahead and submit this badboi to github :)"
 }
 
+format () {
+  if [[ -z $REPO_PATH || ! -d $REPO_PATH ]]; then
+    echo "Can't find repository, quitting"
+    exit 1
+  fi
+
+  # find matching files for clang-format
+  file_list="$(find "$REPO_PATH" -regextype posix-extended -regex '.*\.(cpp|h)' -not -regex '.*(test|debug|cmake).*')"
+
+  # format using specified clang-format settings (directory with .clang-format)
+  cd "$1"
+  if [[ "$2" == "grep" ]]; then
+    clang-format "${@:3}" $file_list 1>/tmp/clang-format 2>&1
+    status=$?
+    cat /tmp/clang-format | grep -v "Formatting"
+  else
+    clang-format "${@:3}" $file_list
+    status=$?
+  fi
+  cd "$OLDPWD"
+  return $status
+}
+
 help () {
   cat << EOF
 usage: $0 [action]
@@ -106,6 +129,19 @@ case $1 in
     tests
     ;;
 
+  check_format)
+    format "${2:-$REPO_PATH}" grep --dry-run --Werror --verbose -i -style=file
+    status=$?
+    if [[ $status -eq 0 ]]; then
+      echo "[+] Formatting is correct for all files!"
+    else
+      echo "[^] Wrong formatting in some files..."
+    fi
+    ;;
+
+  format)
+    format "${2:-$REPO_PATH}" nogrep --verbose -i -style=file
+    ;;
   *)
     echo -ne "Invalid argument.\n\n"
     help
