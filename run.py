@@ -6,7 +6,7 @@ from util import env, run_with_stdout, format_template, check_file_update
 
 
 def action(act):
-  valid_actions = ["test", "build", "send", "checkfmt"]
+  valid_actions = ["test", "build", "send", "format", "checkfmt"]
   if act not in valid_actions:
     raise argparse.ArgumentTypeError("Unknown action: " + act)
   return act
@@ -29,18 +29,15 @@ def init_argparser():
                                      " format+push on success."
                                      "\n\t       You can use the -cf option"
                                      " here to reformat back after sending.\n"
+                                     "\tformat - Format without sending. You"
+                                     " can also use -cf here.\n"
                                      "\tcheckfmt - Check the formatting",
                       type=action,
                       default="test")
-  # parser.add_argument("-b", "--build", help="Run only build, without actually"
-  #                                           " testing the project",
-  #                     dest="only_build", action="store_true")
-  # parser.add_argument("-s", "--send", help="Test the project and "
-  #                                          " format+push on success",
-  #                     dest="send", action="store_true")
-  parser.add_argument("-cf", "--clang-format", help="Path to your own"
-                                                    " clang-format file, which will be used to reformat"
-                                                    " the code back to your style after sending.",
+  parser.add_argument("-cf", "--clang-format",
+                      help="Path to your own"
+                           " clang-format file, which will be used to reformat"
+                           " the code back to your style after formatting.",
                       dest="clang_format")
   return parser
 
@@ -53,6 +50,11 @@ def exec_docker(args, volumes=[]):
       args)) != 0:
     print("Running failed :(")
     sys.exit(1)
+
+
+def format(path):
+  print("Formatting to remote clang-format")
+  exec_docker({**env.variables, "path": path, "act": "format"})
 
 
 def run_image(args):
@@ -68,15 +70,17 @@ def run_image(args):
     exec_docker({**env.variables, "path": path, "act": "check_format"})
     return
 
+  if args.action == "format":
+    format(path)
+    return
+
   # otherwise we need building/testing
   action = "build" if args.action == "build" else "test"
   exec_docker({**env.variables, "path": path, "act": action})
 
   # after running the docker container check if we need to do anything else
   if args.action == "send":
-    print("Formatting to remote clang-format")
-    exec_docker({**env.variables, "path": path, "act": "format"})
-
+    format(path)
     # temporarily switch to repo
     oldpwd = os.getcwd()
     os.chdir(path)
