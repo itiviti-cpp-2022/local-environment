@@ -87,16 +87,14 @@ fmt () {
   file_list="$(find "$REPO_PATH" -regextype posix-extended -regex '.*\.(cpp|h)' -not -regex '.*(test|debug|cmake).*')"
 
   # format using specified clang-format settings (directory with .clang-format)
-  cd "$1"
-  if [[ "$2" == "grep" ]]; then
-    clang-format "${@:3}" $file_list 1>/tmp/clang-format 2>&1
+  if [[ "$1" == "grep" ]]; then
+    clang-format "${@:2}" $file_list 1>/tmp/clang-format 2>&1
     status=$?
     cat /tmp/clang-format | grep -v "Formatting"
   else
-    clang-format "${@:3}" $file_list
+    clang-format "${@:2}" $file_list
     status=$?
   fi
-  cd "$OLDPWD"
   return $status
 }
 
@@ -124,12 +122,12 @@ case $1 in
     ;;
 
   checkfmt)
-    fmt "${2:-$REPO_PATH}" grep --dry-run --Werror --verbose -i -style=file
+    fmt grep --dry-run --Werror --verbose -i -style=file
     exit $?
     ;;
 
   fmt)
-    fmt "${2:-$REPO_PATH}" nogrep --verbose -i -style=file
+    fmt nogrep --verbose -i -style=file
     ;;
   *)
     echo -ne "Invalid argument.\n\n"

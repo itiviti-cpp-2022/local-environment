@@ -21,21 +21,22 @@ def build(args):
 
 def fmt(args):
   if args.clang_format_path:
-    clang_format_path = os.path.realpath(args.clang_format)
+    clang_format_path = os.path.realpath(args.clang_format_path)
     info("Formatting using custom clang-format file ({})"
          .format(clang_format_path))
   else:
-    clang_format_path = os.path.join(args.path, ".clang_format")
+    clang_format_path = os.path.join(args.path, ".clang-format")
     info("Formatting to remote clang-format")
   if not os.path.exists(clang_format_path):
     error(".clang-format file doesn't exist")
     sys.exit(1)
-  run_docker(path=args.path, act="fmt /format"
-              [clang_format_path + ":/format/.clang-format"])
+  run_docker(path=args.path, act="fmt /format",
+             volumes=[
+               clang_format_path + ":{{container_repo_path}}/.clang-format"])
 
 
 def checkfmt(args):
-  clang_format_path = os.path.join(args.path, ".clang_format")
+  clang_format_path = os.path.join(args.path, ".clang-format")
   if not os.path.exists(clang_format_path):
     error(".clang-format file doesn't exist")
     sys.exit(1)
@@ -76,10 +77,10 @@ def add_actions(parser):
     "fmt", help="Clang-Format the repo",
     description="Format code in your repo using remote clang-format"
   )
-  fmt_parser.add_argument("-cf", "--clang-format",
+  fmt_parser.add_argument("clang_format_path",
                           help="Path to clang-format file which should be used"
                                " instead of the remote one for formatting",
-                          dest="clang_format_path")
+                          nargs='?', default=None)
   fmt_parser.set_defaults(func=fmt)
 
   checkfmt_parser = actions_parser.add_parser(
