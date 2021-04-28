@@ -30,6 +30,7 @@ def build_image():
   # For dockerfile temporarily switch folders
   oldpwd = os.getcwd()
   os.chdir(SCRIPT_FOLDER)
+  run_with_stdout("docker image rm --force cpp-env:1.0")
   if run_with_stdout("docker image build . "
                      "--file app/Dockerfile.build --tag cpp-env:1.0") != 0:
     print("Docker build failed.")
