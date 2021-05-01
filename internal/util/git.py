@@ -91,7 +91,7 @@ def repo_updated_at(repo):
   try:
     r = requests.get(repos_request(repo, ''))
     j = r.json()
-    updated_at = datetime.datetime.strptime(j["updated_at"],
+    updated_at = datetime.datetime.strptime(j["pushed_at"],
                                             "%Y-%m-%dT%H:%M:%SZ")
     return updated_at
   except Exception as e:

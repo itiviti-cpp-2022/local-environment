@@ -1,7 +1,7 @@
 from os import path, pardir
 variables = {"container_repo_path": "/repo"}
 requirements = ["requests"]
-remote_repo = {"owner": "Kurkin", "repo": "ica-lint-action", "branch": "master"}
+remote_repo = {"owner": "Kurkin", "repo": "ica-lint-action", "branch": "ica-fixes"}
 
 dependencies = [{"path": "app/libica-plugin.so",
                  "remote_path": "ica/libica-plugin.so",
