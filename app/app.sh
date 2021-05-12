@@ -27,13 +27,13 @@ run_make () {
 
 # Run unit tests after building
 run_test () {
-  if [[ -f "$1/test/runUnitTests" ]]; then
-    cd "$1"
-    if ! "$1/test/runUnitTests"; then
+  if [[ -f "$1/$2/runUnitTests" ]]; then
+    cd "$1/$2"
+    if ! "$1/$2/runUnitTests"; then
       exit 1
     fi
   else
-    cd "$1/test"
+    cd "$1/$2"
     if ! ctest -VV; then
       exit 1
     fi
@@ -59,20 +59,29 @@ build () {
 }
 
 tests () {
+  if [[ -d "/build/test" ]]; then
+    testdir="test"
+  elif [[ -d "/build/tests" ]]; then
+    testdir="tests"
+  else
+    echo "[^] Can't find test directory (tried test and tests)"
+    exit 1
+  fi
+
   echo "[$cnt] Running normal tests"
-  run_test /build
+  run_test /build $testdir
   echo "[+] Normal test success"
   (( cnt++ ))
 
   echo "[$cnt] Running tests with ASAN (Address Sanitizer)"
   build /build_asan -DCMAKE_BUILD_TYPE=ASAN
-  run_test /build_asan
+  run_test /build_asan $testdir
   echo "[+] ASAN test success"
   (( cnt++ ))
 
   echo "[$cnt] Running tests with USAN (Undefined Behaviour Sanitizer)"
   build /build_usan -DCMAKE_BUILD_TYPE=USAN
-  run_test /build_usan
+  run_test /build_usan $testdir
   echo "[+] USAN test success"
   (( cnt++ ))
 }
