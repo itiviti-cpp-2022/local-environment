@@ -93,8 +93,7 @@ fmt () {
   fi
 
   # find matching files for clang-format
-  file_list="$(find "$REPO_PATH" -regextype posix-extended -regex '.*\.(cpp|h)' -not -regex '.*(test|debug|cmake).*')"
-
+  file_list="$(find "$REPO_PATH" -regextype posix-extended -regex '.*\.(cpp|h)' -not -regex '.*/.*?(test|debug|cmake).*?/.*')"
   # format using specified clang-format settings (directory with .clang-format)
   if [[ "$1" == "grep" ]]; then
     clang-format "${@:2}" $file_list 1>/tmp/clang-format 2>&1
