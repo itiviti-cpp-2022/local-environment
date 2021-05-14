@@ -28,7 +28,6 @@ run_make () {
 # Run unit tests after building
 run_test () {
   if [[ -f "$1/$2/runUnitTests" ]]; then
-    cd "$1/$2"
     if ! "$1/$2/runUnitTests"; then
       exit 1
     fi
