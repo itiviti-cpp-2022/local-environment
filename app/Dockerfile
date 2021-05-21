@@ -10,11 +10,11 @@ RUN apt install -y \
       /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-10 100;
 
 # Install clang, cmake for compiling and using ICA
-RUN apt install clang cmake -y
+RUN apt install clang-11 cmake -y
 
 # Make clang the default compiler
-RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-10 60
-RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang-10 60
+RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-11 60
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang-11 60
 
 # Install clang-format if we need formatting
 RUN apt install clang-format -y
