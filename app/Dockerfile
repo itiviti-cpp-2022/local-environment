@@ -2,22 +2,14 @@ FROM dokken/ubuntu-20.04:latest
 
 LABEL maintainer="renbou"
 
-# Like in workflow
-RUN apt update
-RUN apt install -y \
-      clang-tidy-10; \
-    sudo update-alternatives --install \
-      /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-10 100;
+# Install all required tools
+RUN apt update && \
+    apt install -y clang-tidy-10 clang-11 clang-format cmake
 
-# Install clang, cmake for compiling and using ICA
-RUN apt install clang-11 cmake -y
-
-# Make clang the default compiler
-RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-11 60
-RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang-11 60
-
-# Install clang-format if we need formatting
-RUN apt install clang-format -y
+# Make clang the default compiler, make clang-tidy link
+RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-11 60 && \
+    update-alternatives --install /usr/bin/cc cc /usr/bin/clang-11 60 && \
+    update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-10 100
 
 RUN mkdir /env
 WORKDIR /env
