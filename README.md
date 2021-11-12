@@ -1,5 +1,5 @@
 # Local Environment
-A localized replica of the Github CI environment used for ITMO Year1 C++ course, which you can use to test your lab submissions locally (so that you don't use up precious Github CI AND your own time).
+A localized replica of the Github CI environment used for ITMO Year1 C++ course, which you can use to test your lab submissions locally (so that you don't use up precious Github CI AND your own time).  
 [По русски](#я-русский)
 
 ## Usage
