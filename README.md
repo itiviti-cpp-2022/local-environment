@@ -1,6 +1,6 @@
 # Local Environment
 A localized replica of the Github CI environment used for ITMO Year1 C++ course, which you can use to test your lab submissions locally (so that you don't use up precious Github CI AND your own time).  
-[По русски](#я-русский)
+[По-русски](#я-русский)
 
 ## Usage
 Since this environment is mostly based around Docker containers, you should first set it up on your PC. Download Docker for your OS here - [Get Docker](https://docs.docker.com/get-docker/). As well as the download itself, there's also a sidebar on the left with a small tutorial, so that you know how to get started. After the installation, there shouldn't be any need to actually control Docker yourself (other than actually launching it), everything is done through two scripts present in this repository - **build.py** and **run.py**.
