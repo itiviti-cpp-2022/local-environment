@@ -4,7 +4,9 @@ LABEL maintainer="renbou"
 
 # Install all required tools
 RUN apt update && \
-    apt install -y clang-tidy-10 clang-11 clang-format cmake
+    apt install -y clang-tidy-10 clang-11 clang-format cmake && \
+    apt install -y pkg-config &&\
+    apt install -y libjemalloc-dev
 
 # Make clang the default compiler, make clang-tidy link
 RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-11 60 && \
